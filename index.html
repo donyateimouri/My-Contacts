@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacts | Home</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <link rel="stylesheet" href="./assets/css/custom.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+</head>
+
+<body>
+    <main class="bg-primary">
+        <div id="app" class="shadow">
+            <div class="row border-bottom py-2 mb-4">
+                <div class="col-8 text-left">
+                    <h5>Contactino</h5>
+                </div>
+                <div class="col-4">
+                    <button onclick="app.showContactList()" class="btn btn-sm btn-dark">Contacts</button>
+                </div>
+            </div>
+            <form id="contactForm" onsubmit="app.init(event)">
+                <div class="form-group">
+                    <input type="text" name="name" class="form-control" placeholder="Contact Name">
+                </div>
+                <div class="form-group">
+                    <input type="text" name="mobile" class="form-control" placeholder="mobile">
+                </div>
+                <div class="form-group">
+                    <input type="text" name="email" class="form-control" placeholder="email">
+                    <small class="invalid-field"></small>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="phone" class="form-control" placeholder="phone">
+                </div>
+                <div class="form-group">
+                    <textarea name="bio" placeholder="bio" class="form-control"></textarea>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-block btn-primary">Submit</button>
+                </div>
+            </form>
+
+            <div id="contactListWrapper" class="d-none">
+                <input oninput="app.searchContact(this.value)" type="text" class="form-control mb-3" placeholder="Search...">
+
+                <div id="contactList">
+                    
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const app = {
+            
+            form: document.querySelector('#contactForm'),
+            contactListArea: document.querySelector('#contactList'),
+            contactListWrapper: document.querySelector('#contactListWrapper'),
+            contacts: [],
+            contact: {
+                name: null,
+                mobile: null,
+                email: null,
+                phone: null,
+                bio: null
+            },
+            init(e) {
+                e.preventDefault();
+                this.getContacts();
+                this.form = e.target;
+                this.setContactData();
+                this.validation();
+                // Save Contact
+                this.saveContact(this.contact);
+
+                this.setContactList();
+                this.notif();
+            },
+            setContactData() {
+                //let fields = this.form.elements;
+                this.contact.name = this.form.elements.name.value;
+                this.contact.mobile = this.form.elements.mobile.value;
+                this.contact.phone = this.form.elements.phone.value;
+                this.contact.bio = this.form.elements.bio.value;
+                this.contact.email = this.form.elements.email.value;
+
+                // Object Variable Key
+
+                // let variable = 'email';
+                // console.log(this.contact[variable])
+
+                // for(const x in fields){
+                //     if(fields[x].getAttribute('name')){
+                //         let fieldName = fields[x].getAttribute('name');
+                //         this.contact[fieldName] = fields[x].value;
+                //     }
+                //     console.log(this.contact)
+
+                // }
+            },
+            validation() {
+                // Email Validation =>     ....@.... .com  ....
+                if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.contact.email)) {
+                    console.log('OK')
+                } else {
+                    console.log('NOK')
+                }
+            },
+            saveContact(contact) {
+                this.contacts.push(contact);
+                this.setContacts(this.contacts);
+                this.form.reset();
+
+                console.log(this.contacts)
+            },
+            getContacts() {
+                let contacts = localStorage.getItem('contacts');
+                if (contacts) {
+                    this.contacts = JSON.parse(contacts);
+                } else {
+                    contacts = '[]';
+                    localStorage.setItem('contacts', JSON.stringify(contacts));
+                }
+                return JSON.parse(contacts);
+            },
+            setContacts(contacts) {
+                localStorage.setItem('contacts', JSON.stringify(contacts));
+            },
+            notif() {
+                Toastify({
+                    text: "Contact was added successfully!",
+                    duration: 2000,
+                    newWindow: true,
+                    close: true,
+                    gravity: "top", // `top` or `bottom`
+                    position: "left", // `left`, `center` or `right`
+                    stopOnFocus: true, // Prevents dismissing of toast on hover
+                    style: {
+                        background: "linear-gradient(to right, black, black)",
+                    },
+                    onClick: function () { } // Callback after click
+                }).showToast();
+            },
+            showContactList() {
+                this.contactListWrapper.classList.toggle('d-none');
+                this.form.classList.toggle('d-none');
+            },
+            infoContact(name, mobile, email, phone, bio) {
+                Swal.fire({
+                    icon: 'info',
+                    html: `
+                        <div class="d-flex justify-content-between border my-2 p-2">
+                            <span>Name:</span>
+                            <span>${name}</span>  
+                        </div>
+                        <div class="d-flex justify-content-between border my-2 p-2">
+                            <span>Mobile:</span>
+                            <a href="tel:${mobile}">${mobile}</a>  
+                        </div>
+                        <div class="d-flex justify-content-between border my-2 p-2">
+                            <span>Email:</span>
+                            <span >
+                                <a href="mailto:${email}">${email}</a>
+                            </span>  
+                        </div>
+                        <div class="d-flex justify-content-between border my-2 p-2">
+                            <span>Phone:</span>
+                            <span>${phone}</span>  
+                        </div>
+                        <div class="d-flex justify-content-between border my-2 p-2">
+                            <span>Bio:</span>
+                            <span>${bio}</span>  
+                        </div>
+                        `
+                })
+
+            },
+            setContactList(keyword = null) {
+                let contacts = this.getContacts();
+                this.contactListArea.innerHTML = '';
+                if (contacts.length > 0) {
+                    contacts.forEach((contact, index) => {
+                        if(keyword){
+                            console.log(contact.name.toLowerCase())
+                            console.log(keyword.toLowerCase())
+
+                            if(contact.name.toLowerCase().includes(keyword.toLowerCase())){
+                                this.contactListArea.innerHTML += this.contactListTemplate(contact, index);
+                            }
+                        } else {
+                            this.contactListArea.innerHTML += this.contactListTemplate(contact, index);
+                        }
+                        
+                    })
+                }
+
+            },
+            deleteContact(index) {
+                let contacts = this.getContacts();
+                contacts.splice(index, 1);
+                this.setContacts(contacts);
+                this.setContactList();
+                console.log(contacts)
+            },
+            searchContact(keyword){
+                if(keyword.length >= 3){
+                    this.setContactList(keyword);
+                } else {
+                    this.setContactList();
+
+                }
+            },
+            contactListTemplate(contact, index) {
+                return `
+                <div class="media border align-items-center 
+                ${contact.name.toLowerCase() == 'reza' ? 'bg-dark text-white' : ''}
+                p-2 shadow mb-2 text-left">
+                    <div class="media-body">
+                        <h6 class="mt-0">${contact.name}</h6>
+                        <small>${contact.mobile}</small>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-primary"
+                        onclick="app.infoContact('${contact.name}','${contact.mobile}','${contact.email}','${contact.phone}','${contact.bio}')"
+                        >i</button>
+                        <button onclick="app.deleteContact(${index})" class="btn btn-sm btn-danger">Del</button>
+
+                    </div>
+                </div>
+                `;
+            }
+        }
+        app.setContactList();
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,22 @@
+main {
+    height: 100vh!important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#app{
+    background-color: white;
+    padding: 0 20px;
+    border-radius: 25px;
+    width: 25%;
+    height: 600px;
+    text-align: center;
+    border: 10px solid black;
+    overflow-y: auto;
+}
+.invalid-field{
+    color: red;
+    font-weight: 0.8rem;
+    text-align: left;
+    display: block;
+}
